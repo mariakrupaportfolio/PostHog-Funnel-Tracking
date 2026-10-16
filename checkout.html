@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout · Fjord Data Summit</title>
+  <script src="tracking.js"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 640px; margin: 80px auto; padding: 0 16px; }
+    button { font-size: 18px; padding: 12px 32px; cursor: pointer; }
+    #done { display: none; }
+  </style>
+  <!-- PostHog -->
+  <script>
+    !function(t,e){ var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],Object.defineProperty(u,"toString",{configurable:!0,enumerable:!0,writable:!0,value:function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e}}),Object.defineProperty(u.people,"toString",{configurable:!0,enumerable:!0,writable:!0,value:function(){return u.toString(1)+".people (stub)"}}),o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('YOUR_POSTHOG_PROJECT_KEY', {
+      api_host: 'https://eu.i.posthog.com',
+      defaults: '2026-05-30'
+    })
+  </script>
+</head>
+<body>
+  <div id="checkout">
+    <h1>Checkout</h1>
+    <p>Ticket: <strong id="ticket-name"></strong></p>
+    <p>Total: <strong id="price"></strong> DKK</p>
+    <p><small>Fake checkout: no payment is taken.</small></p>
+    <button id="pay">Pay now</button>
+  </div>
+
+  <div id="done">
+    <h1>You're registered!</h1>
+    <p>Order <strong id="order"></strong></p>
+  </div>
+
+  <script>
+    // Read which ticket was chosen on the previous page (from the URL).
+    var ticket = getFromUrl('ticket');
+    var prices = { standard: 1200, vip: 3500 };
+    var price = prices[ticket];
+
+    document.getElementById('ticket-name').textContent = ticket;
+    document.getElementById('price').textContent = price;
+
+    // EVENT 4 — they reached checkout. Comparing this with EVENT 5
+    // shows how many people get to checkout but never pay.
+    track('checkout_started', {
+      ticket_type: ticket,
+      price_dkk: price
+    });
+
+    // EVENT 5 — the conversion. order_id makes each purchase unique,
+    // so duplicates can be spotted and removed later.
+    document.getElementById('pay').addEventListener('click', function () {
+      var orderId = 'FDS-' + Date.now();
+      track('purchase_completed', {
+        ticket_type: ticket,
+        price_dkk: price,
+        order_id: orderId
+      });
+      document.getElementById('order').textContent = orderId;
+      document.getElementById('checkout').style.display = 'none';
+      document.getElementById('done').style.display = 'block';
+    });
+  </script>
+</body>
+</html>
