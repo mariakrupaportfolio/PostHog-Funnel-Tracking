@@ -6,7 +6,7 @@
 
 // Your PostHog project key (starts with phc_): PostHog → Settings → Project → Project API key.
 // It's safe to have this in public code; it can only SEND events, not read data.
-const POSTHOG_KEY = 'YOUR_POSTHOG_PROJECT_KEY';
+const POSTHOG_KEY = 'phc_sgtngCwEjqga5MfLgMsWmGq6UVGBeteLMdZqED2TAQu4';
 
 // ---- Official PostHog loader. Copy-paste code: you don't need to understand it.
 // It creates the `posthog` object and loads the real library in the background.
@@ -25,7 +25,7 @@ posthog.init(POSTHOG_KEY, {
 // ---- The one function every page uses.
 // eventName = WHAT happened, properties = the DETAILS of it.
 function track(eventName, properties) {
-  posthog.capture(eventName, properties);
+  posthog.capture(eventName, properties, { transport: 'sendBeacon' });
 }
 
 // Reads a value from the URL. On checkout.html?ticket=vip,
